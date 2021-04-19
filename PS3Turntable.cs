@@ -50,11 +50,17 @@ namespace GHLtarUtility
                 if (bytesRead > 0)
                 {
                     // Set the table buttons on the virtual 360 controller
-                    byte buttons = readBuffer[0];
-                    controller.SetButtonState(Xbox360Button.A, (buttons & 0x02) != 0x00); // green
-                    controller.SetButtonState(Xbox360Button.B, (buttons & 0x04) != 0x00); // red
-                    controller.SetButtonState(Xbox360Button.X, (buttons & 0x01) != 0x00); // blue
-                    controller.SetButtonState(Xbox360Button.Y, (buttons & 0x08) != 0x00); // euphoria
+                    byte buttons = readBuffer[23];
+                    controller.SetButtonState(Xbox360Button.A, (buttons & 0x01) != 0x00); // left green
+                    controller.SetButtonState(Xbox360Button.B, (buttons & 0x02) != 0x00); // left red
+                    controller.SetButtonState(Xbox360Button.X, (buttons & 0x04) != 0x00); // left blue
+                    controller.SetButtonState(Xbox360Button.Y, (buttons & 0x10) != 0x00); // right green
+                    controller.SetButtonState(Xbox360Button.LeftShoulder, (buttons & 0x20) != 0x00); // right red
+                    controller.SetButtonState(Xbox360Button.RightShoulder, (buttons & 0x40) != 0x00); // right blue
+
+                    // Set euphoria button
+                    buttons = readBuffer[0];
+                    controller.SetButtonState(Xbox360Button.LeftThumb, (buttons & 0x08) != 0x00); // euphoria
 
                     // Set the start/select/ps buttons
                     buttons = readBuffer[1];

@@ -49,12 +49,19 @@ namespace GHLtarUtilityLite
                 // Prevent default 0x00 when no bytes are read
                 if (bytesRead > 0)
                 {
-                    // Set the table buttons on the virtual 360 controller
-                    byte buttons = readBuffer[0];
-                    controller.SetButtonState(Xbox360Button.A, (buttons & 0x02) != 0x00); // green
-                    controller.SetButtonState(Xbox360Button.B, (buttons & 0x04) != 0x00); // red
-                    controller.SetButtonState(Xbox360Button.X, (buttons & 0x01) != 0x00); // blue
-                    controller.SetButtonState(Xbox360Button.Y, (buttons & 0x08) != 0x00); // euphoria
+                    // Set table buttons to DJMAX 6B controls
+                    byte buttons = readBuffer[23];
+                    controller.SetButtonState(Xbox360Button.Left, (buttons & 0x40) != 0x00 || readBuffer[2] == 5 || readBuffer[2] == 6 || readBuffer[2] == 7); // left blue & dpad left
+                    controller.SetButtonState(Xbox360Button.Up, (buttons & 0x20) != 0x00 || readBuffer[2] == 7 || readBuffer[2] == 0 || readBuffer[2] == 1); // left red & dpad up
+                    controller.SetButtonState(Xbox360Button.Right, (buttons & 0x10) != 0x00 || readBuffer[2] == 1 || readBuffer[2] == 2 || readBuffer[2] == 3); // left green & dpad right
+                    controller.SetButtonState(Xbox360Button.X, (buttons & 0x01) != 0x00); // right green
+                    controller.SetButtonState(Xbox360Button.Y, (buttons & 0x02) != 0x00); // right red
+                    controller.SetButtonState(Xbox360Button.B, (buttons & 0x04) != 0x00); // right blue
+
+                    // Set euphoria button to fever
+                    // Set a fast scratch to also trigger fever
+                    buttons = readBuffer[0];
+                    controller.SetButtonState(Xbox360Button.A, (buttons & 0x08) != 0x00 || readBuffer[5] > 132 || readBuffer[5] < 124 || readBuffer[6] > 132 || readBuffer[6] < 124); // euphoria
 
                     // Set the start/select/ps buttons
                     buttons = readBuffer[1];
@@ -62,22 +69,11 @@ namespace GHLtarUtilityLite
                     controller.SetButtonState(Xbox360Button.Back, (buttons & 0x01) != 0x00); // Select
                     controller.SetButtonState(Xbox360Button.Guide, (buttons & 0x10) != 0x00); // Sync Button
 
-                    // Set turntable axes
-                    // double the axis value to increase sensitivity
-                    controller.SetAxisValue(Xbox360Axis.LeftThumbX, ClampShort((readBuffer[5] << 9) - 65536));
-                    controller.SetAxisValue(Xbox360Axis.LeftThumbY, ClampShort((readBuffer[6] << 9) - 65536));
-
-                    // Set effects axis
-                    controller.SetAxisValue(Xbox360Axis.RightThumbX, (short)(((readBuffer[19] << 6) | (readBuffer[20] << 14)) - 32768));
-
                     // Set crossfader axis
-                    controller.SetAxisValue(Xbox360Axis.RightThumbY, (short)(((readBuffer[21] << 6) | (readBuffer[22] << 14)) - 32768));
+                    controller.SetAxisValue(Xbox360Axis.LeftThumbX, (short)(((readBuffer[21] << 6) | (readBuffer[22] << 14)) - 32768));
 
                     // Set DPAD
-                    controller.SetButtonState(Xbox360Button.Up, readBuffer[2] == 7 || readBuffer[2] == 0 || readBuffer[2] == 1);
-                    controller.SetButtonState(Xbox360Button.Right, readBuffer[2] == 1 || readBuffer[2] == 2 || readBuffer[2] == 3);
                     controller.SetButtonState(Xbox360Button.Down, readBuffer[2] == 3 || readBuffer[2] == 4 || readBuffer[2] == 5);
-                    controller.SetButtonState(Xbox360Button.Left, readBuffer[2] == 5 || readBuffer[2] == 6 || readBuffer[2] == 7);
                 }
             }
         }

@@ -70,7 +70,8 @@ namespace GHLtarUtilityLite
                     controller.SetButtonState(Xbox360Button.Guide, (buttons & 0x10) != 0x00); // Sync Button
 
                     // Set crossfader axis
-                    controller.SetAxisValue(Xbox360Axis.LeftThumbX,  (short)((((readBuffer[21] & 0xF0) << 6) | ((readBuffer[22] & 0x03) << 14)) - 32768));
+                    int faderValue = (((readBuffer[21] & 0xF0) << 6) | ((readBuffer[22] & 0x03) << 14)) - 32768;
+                    controller.SetAxisValue(Xbox360Axis.LeftThumbX, (short)(faderValue > 16384 || faderValue < -16384 ? faderValue : 0));
 
                     // Set DPAD
                     controller.SetButtonState(Xbox360Button.Down, readBuffer[2] == 3 || readBuffer[2] == 4 || readBuffer[2] == 5);
